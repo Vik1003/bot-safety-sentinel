@@ -12,6 +12,7 @@ export interface AnalysisResult {
   botBehaviorScore: number; // 0-100
   timestamp: string;
   details?: string;
+  featureMetrics?: FeatureMetric[]; // Added detailed metrics
 }
 
 export interface FeatureMetric {
