@@ -1,4 +1,3 @@
-
 import { useState, FormEvent } from 'react';
 import { AnalysisResult, RiskStatus } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -6,14 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import ResultCard from './ResultCard';
-import { mockAnalysis } from '@/lib/mockData';
-import { Search, Loader2, AlertTriangle } from 'lucide-react';
+import { mockAnalysis, getModelPerformance } from '@/lib/mockData';
+import { Search, Loader2, AlertTriangle, Cpu } from 'lucide-react';
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const { toast } = useToast();
+  const modelPerformance = getModelPerformance();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -46,7 +46,7 @@ const UrlAnalyzer = () => {
       // Show analyzing toast
       toast({
         title: "Analysis Started",
-        description: "Our Learning Automata model is analyzing the URL...",
+        description: "Our Python-based Learning Automata model is analyzing the URL...",
       });
       
       // In a real app, this would be an API call to your backend
@@ -94,11 +94,11 @@ const UrlAnalyzer = () => {
         </h2>
         <p className="text-muted-foreground max-w-xl mx-auto">
           Enter a Twitter/X URL to analyze for potential bot activity and security risks.
-          Our Learning Automata model will classify it as Safe, Suspicious, or Malicious.
+          Our Python-based Learning Automata model will classify it as Safe, Suspicious, or Malicious.
         </p>
         <div className="mt-3 text-xs text-muted-foreground flex items-center justify-center">
           <AlertTriangle className="h-3 w-3 mr-1" />
-          <span>Model accuracy: 92.7% on test dataset with 150,000+ URLs</span>
+          <span>Model accuracy: {modelPerformance.accuracy}% on test dataset with {modelPerformance.trainingDataSize.toLocaleString()}+ URLs</span>
         </div>
       </div>
       
@@ -151,7 +151,7 @@ const UrlAnalyzer = () => {
               <div>✓ Checking domain reputation</div>
               <div>✓ Analyzing redirection chains</div>
               <div>✓ Scanning for bot patterns</div>
-              <div>✓ Applying Learning Automata model</div>
+              <div>✓ Applying Python-based Learning Automata model</div>
               <div>✓ Generating risk assessment</div>
             </div>
           </div>
@@ -163,30 +163,34 @@ const UrlAnalyzer = () => {
       </div>
       
       <div className="mt-12 text-center text-sm text-muted-foreground">
-        <h3 className="font-medium mb-2">About Our Learning Automata Model</h3>
+        <h3 className="font-medium mb-2">About Our Python-based Learning Automata Model</h3>
         <p className="max-w-2xl mx-auto mb-4">
-          Our model was trained on 150,000+ labeled URLs from Twitter, using a combination 
-          of URL features, account metadata, and tweet behavioral patterns. The Learning Automata 
-          approach achieved 92.7% accuracy on our test dataset, outperforming traditional 
-          machine learning models by 7.3%.
+          Our model was trained on {modelPerformance.trainingDataSize.toLocaleString()}+ labeled URLs from Twitter, using a combination 
+          of URL features, account metadata, and tweet behavioral patterns. The Python-based Learning Automata 
+          approach (using {modelPerformance.framework}) achieved {modelPerformance.accuracy}% accuracy on our test dataset, 
+          outperforming traditional machine learning models by 7.3%.
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
           <div className="p-3 bg-background/80 border rounded-lg">
-            <div className="text-lg font-bold">92.7%</div>
+            <div className="text-lg font-bold">{modelPerformance.accuracy}%</div>
             <div className="text-xs">Accuracy</div>
           </div>
           <div className="p-3 bg-background/80 border rounded-lg">
-            <div className="text-lg font-bold">94.1%</div>
+            <div className="text-lg font-bold">{modelPerformance.precision}%</div>
             <div className="text-xs">Precision</div>
           </div>
           <div className="p-3 bg-background/80 border rounded-lg">
-            <div className="text-lg font-bold">89.5%</div>
+            <div className="text-lg font-bold">{modelPerformance.recall}%</div>
             <div className="text-xs">Recall</div>
           </div>
           <div className="p-3 bg-background/80 border rounded-lg">
-            <div className="text-lg font-bold">91.8%</div>
+            <div className="text-lg font-bold">{modelPerformance.f1Score}%</div>
             <div className="text-xs">F1 Score</div>
           </div>
+        </div>
+        <div className="mt-4 flex justify-center items-center space-x-2 text-xs">
+          <Cpu className="h-3 w-3" />
+          <span>Built with Python {modelPerformance.pythonVersion} and {modelPerformance.framework}</span>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { AnalysisResult, FeatureMetric } from './types';
+import { AnalysisResult, FeatureMetric, ModelPerformance, DatasetMetrics } from './types';
 
 export const mockAnalysis = (url: string): Promise<AnalysisResult> => {
   // This is mock data for demonstration purposes
@@ -36,6 +36,8 @@ export const mockAnalysis = (url: string): Promise<AnalysisResult> => {
         botBehaviorScore
       });
       
+      const modelConfidence = isMalicious ? 92.7 : (isSuspicious ? 76.4 : 94.2);
+      
       const result: AnalysisResult = {
         status: isMalicious ? 'malicious' : (isSuspicious ? 'suspicious' : 'safe'),
         score: score,
@@ -47,7 +49,9 @@ export const mockAnalysis = (url: string): Promise<AnalysisResult> => {
         botBehaviorScore,
         timestamp: new Date().toISOString(),
         details: getDetails(isMalicious, isSuspicious, url),
-        featureMetrics
+        featureMetrics,
+        modelConfidence,
+        modelAccuracy: 92.7
       };
       
       resolve(result);
@@ -136,12 +140,10 @@ function generateFeatureMetrics({
 }
 
 export const getFeatureMetrics = (result: AnalysisResult): FeatureMetric[] => {
-  // If the result already has feature metrics, return them
   if (result.featureMetrics && result.featureMetrics.length > 0) {
     return result.featureMetrics;
   }
   
-  // Otherwise generate them based on the result data
   return generateFeatureMetrics({
     score: result.score,
     redirectionsCount: result.redirectionsCount,
@@ -165,10 +167,39 @@ function stringToHash(str: string): number {
 
 function getDetails(isMalicious: boolean, isSuspicious: boolean, url: string): string {
   if (isMalicious) {
-    return `The URL ${url} shows multiple high-risk factors including suspicious redirect chains, poor domain reputation, and bot-like behavior patterns. Our Learning Automata model has classified this URL as malicious with high confidence (92.7% accuracy). We recommend avoiding this link.`;
+    return `The URL ${url} shows multiple high-risk factors including suspicious redirect chains, poor domain reputation, and bot-like behavior patterns. Our Python-based Learning Automata model has classified this URL as malicious with high confidence (92.7% accuracy). We recommend avoiding this link.`;
   } else if (isSuspicious) {
-    return `The URL ${url} has some concerning characteristics such as URL shortening or unknown domain reputation. Our Learning Automata model has flagged some potential risks but cannot definitively classify it as malicious (76.4% confidence). Proceed with caution.`;
+    return `The URL ${url} has some concerning characteristics such as URL shortening or unknown domain reputation. Our Python-based Learning Automata model has flagged some potential risks but cannot definitively classify it as malicious (76.4% confidence). Proceed with caution.`;
   } else {
-    return `The URL ${url} appears to be safe based on our analysis. No suspicious patterns detected by our Learning Automata model, which has achieved a 94.2% accuracy on known safe URLs. The classification confidence for this URL is high.`;
+    return `The URL ${url} appears to be safe based on our analysis. No suspicious patterns detected by our Python-based Learning Automata model, which has achieved a 94.2% accuracy on known safe URLs. The classification confidence for this URL is high.`;
   }
 }
+
+// New function to get model performance metrics
+export const getModelPerformance = (): ModelPerformance => {
+  return {
+    accuracy: 92.7,
+    precision: 94.1,
+    recall: 89.5,
+    f1Score: 91.8,
+    trainingDataSize: 150000,
+    trainingTime: "14 hours 22 minutes",
+    lastUpdated: "2023-08-15T00:00:00Z",
+    framework: "PyTorch",
+    pythonVersion: "3.9.7"
+  };
+};
+
+// New function to get dataset metrics
+export const getDatasetMetrics = (): DatasetMetrics => {
+  return {
+    totalSamples: 150000,
+    maliciousSamples: 45000,
+    suspiciousSamples: 30000,
+    safeSamples: 75000,
+    urlFeatures: 24,
+    behaviorFeatures: 18,
+    metadataFeatures: 12,
+    featureExtractionTool: "pandas + scikit-learn"
+  };
+};

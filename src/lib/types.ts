@@ -32,6 +32,8 @@ export interface ModelPerformance {
   trainingDataSize: number;
   trainingTime: string; // e.g., "3 hours 45 minutes"
   lastUpdated: string; // ISO date string
+  framework: string; // e.g., "PyTorch", "TensorFlow"
+  pythonVersion: string; // e.g., "3.9.7"
 }
 
 export interface DatasetMetrics {
@@ -42,4 +44,5 @@ export interface DatasetMetrics {
   urlFeatures: number;
   behaviorFeatures: number;
   metadataFeatures: number;
+  featureExtractionTool: string; // e.g., "pandas", "scikit-learn"
 }
