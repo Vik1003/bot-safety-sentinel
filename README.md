@@ -1,4 +1,4 @@
-# Twitter URL Safety Sentinel
+
 
 A machine learning-powered application that analyzes Twitter/X URLs for potential security risks. Built with React, TypeScript, FastAPI, and scikit-learn.
 
