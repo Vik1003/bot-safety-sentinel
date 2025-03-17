@@ -1,20 +1,20 @@
-
 export type RiskStatus = 'safe' | 'suspicious' | 'malicious' | 'analyzing';
 
 export interface AnalysisResult {
-  status: RiskStatus;
-  score: number; // 0-100
   url: string;
-  redirectionsCount: number;
-  isShortened: boolean;
-  domainReputation: string;
-  sslStatus: boolean;
-  botBehaviorScore: number; // 0-100
+  is_safe: boolean;
+  confidence_score: number;
+  prediction_stability: number;
+  probabilities: {
+    safe: number;
+    malicious: number;
+  };
+  feature_importance: Array<{
+    feature: string;
+    importance: number;
+  }>;
+  analysis_time: number;
   timestamp: string;
-  details?: string;
-  featureMetrics?: FeatureMetric[]; // Detailed metrics
-  modelConfidence?: number; // 0-100, represents the model's confidence in its prediction
-  modelAccuracy?: number; // 0-100, represents the overall model accuracy
 }
 
 export interface FeatureMetric {
@@ -25,24 +25,33 @@ export interface FeatureMetric {
 }
 
 export interface ModelPerformance {
-  accuracy: number; // 0-100
-  precision: number; // 0-100
-  recall: number; // 0-100
-  f1Score: number; // 0-100
-  trainingDataSize: number;
-  trainingTime: string; // e.g., "3 hours 45 minutes"
-  lastUpdated: string; // ISO date string
-  framework: string; // e.g., "PyTorch", "TensorFlow"
-  pythonVersion: string; // e.g., "3.9.7"
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1_score: number;
+  auc_roc: number;
+  framework: string;
+  modelType: string;
+  baseModels: string[];
+  modelVersion: string;
+  lastUpdated: string;
 }
 
 export interface DatasetMetrics {
-  totalSamples: number;
-  maliciousSamples: number;
-  suspiciousSamples: number;
-  safeSamples: number;
-  urlFeatures: number;
-  behaviorFeatures: number;
-  metadataFeatures: number;
-  featureExtractionTool: string; // e.g., "pandas", "scikit-learn"
+  total_samples: number;
+  safe_samples: number;
+  malicious_samples: number;
+  features_used: string[];
+  last_updated: string;
+  data_sources: string[];
+  class_distribution: {
+    safe: number;
+    malicious: number;
+  };
+}
+
+export interface APIError {
+  message: string;
+  status: number;
+  details?: string;
 }

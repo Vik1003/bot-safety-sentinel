@@ -1,28 +1,85 @@
-# Welcome to your Lovable project
+# Twitter URL Safety Sentinel
 
-## Project info
+A machine learning-powered application that analyzes Twitter/X URLs for potential security risks. Built with React, TypeScript, FastAPI, and scikit-learn.
 
-**URL**: https://lovable.dev/projects/f5838ab6-8284-4fdf-8da4-1d9cc4ecbb83
+## Features
 
-## How can I edit this code?
+- Analyzes Twitter/X profile and tweet URLs for security risks
+- Uses a stack ensemble model combining multiple ML algorithms
+- Real-time analysis with confidence scores
+- Beautiful and responsive UI built with React and Tailwind CSS
+- Python backend with FastAPI
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+### Frontend
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui components
+- React Query for data fetching
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f5838ab6-8284-4fdf-8da4-1d9cc4ecbb83) and start prompting.
+### Backend
+- Python
+- FastAPI
+- scikit-learn
+- snscrape for Twitter data collection
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
+- Node.js 16+
+- Python 3.8+
+- npm or yarn
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/twitter-url-safety-sentinel.git
+cd twitter-url-safety-sentinel
+```
 
-Follow these steps:
+2. Install frontend dependencies:
+```bash
+cd src
+npm install
+```
 
-```sh
+3. Install backend dependencies:
+```bash
+cd api
+pip install -r requirements.txt
+```
+
+4. Start the development servers:
+
+Frontend:
+```bash
+cd src
+npm run dev
+```
+
+Backend:
+```bash
+cd api
+uvicorn main:app --reload
+```
+
+## Deployment
+
+The application can be deployed using:
+- Frontend: Vercel
+- Backend: Railway, Heroku, or similar platforms
+
+## License
+
+MIT License - feel free to use this project for your own purposes.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
 # Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
 
@@ -60,10 +117,3 @@ This project is built with .
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f5838ab6-8284-4fdf-8da4-1d9cc4ecbb83) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)

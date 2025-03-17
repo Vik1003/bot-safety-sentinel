@@ -1,27 +1,23 @@
-
+import axios from 'axios';
 import { AnalysisResult, ModelPerformance, DatasetMetrics } from './types';
 
 // Base URL for the Python backend API
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 /**
  * Analyzes a URL for safety using the Python ML model API
  */
 export const analyzeUrl = async (url: string): Promise<AnalysisResult> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/analyze`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ url }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await apiClient.post('/analyze', { url });
+    return response.data;
   } catch (error) {
     console.error('Error analyzing URL:', error);
     throw error;
@@ -33,13 +29,8 @@ export const analyzeUrl = async (url: string): Promise<AnalysisResult> => {
  */
 export const getModelPerformance = async (): Promise<ModelPerformance> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/model/performance`);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await apiClient.get('/model/performance');
+    return response.data;
   } catch (error) {
     console.error('Error fetching model performance:', error);
     throw error;
@@ -51,15 +42,22 @@ export const getModelPerformance = async (): Promise<ModelPerformance> => {
  */
 export const getDatasetMetrics = async (): Promise<DatasetMetrics> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/model/dataset`);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await apiClient.get('/model/dataset');
+    return response.data;
   } catch (error) {
     console.error('Error fetching dataset metrics:', error);
     throw error;
   }
 };
+
+export const getModelHealth = async (): Promise<{ status: string; message: string }> => {
+  try {
+    const response = await apiClient.get('/health');
+    return response.data;
+  } catch (error) {
+    console.error('Error checking model health:', error);
+    throw error;
+  }
+};
+
+export default apiClient;

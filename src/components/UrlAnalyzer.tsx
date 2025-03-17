@@ -1,4 +1,3 @@
-
 import { useState, FormEvent, useEffect } from 'react';
 import { AnalysisResult, RiskStatus, ModelPerformance } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -8,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import ResultCard from './ResultCard';
 import { analyzeUrl, getModelPerformance } from '@/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Loader2, AlertTriangle, Cpu } from 'lucide-react';
+import { Search, Loader2, AlertTriangle } from 'lucide-react';
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState('');
@@ -70,34 +69,29 @@ const UrlAnalyzer = () => {
       // Show analyzing toast
       toast({
         title: "Analysis Started",
-        description: "Our Python-based Learning Automata model is analyzing the URL...",
+        description: "Our ML model is analyzing the URL...",
       });
       
-      // Call the real API
+      // Call the API
       const analysisResult = await analyzeUrl(url);
       
       // Show analysis result
       setResult(analysisResult);
       
       // Show toast notification based on result
-      const toastMessages = {
-        safe: "This URL appears to be safe with high model confidence.",
-        suspicious: "This URL has suspicious characteristics. Proceed with caution.",
-        malicious: "Warning! This URL is likely malicious. We recommend avoiding it.",
-      };
+      const status = analysisResult.is_safe ? 'Safe' : 'Malicious';
+      const confidence = (analysisResult.confidence_score * 100).toFixed(1);
       
       toast({
-        title: `Analysis Complete: ${analysisResult.status.charAt(0).toUpperCase() + analysisResult.status.slice(1)}`,
-        description: toastMessages[analysisResult.status as keyof typeof toastMessages] + 
-                     ` (${analysisResult.modelConfidence?.toFixed(1)}% confidence)`,
-        variant: analysisResult.status === 'malicious' ? 'destructive' : 
-                 analysisResult.status === 'suspicious' ? 'default' : 'default',
+        title: `Analysis Complete: ${status}`,
+        description: `This URL appears to be ${status.toLowerCase()} with ${confidence}% confidence.`,
+        variant: analysisResult.is_safe ? 'default' : 'destructive',
       });
     } catch (error) {
       console.error("Analysis error:", error);
       toast({
         title: "Analysis Failed",
-        description: "We couldn't analyze this URL. The Python backend might be unavailable.",
+        description: "We couldn't analyze this URL. Please try again later.",
         variant: "destructive",
       });
     } finally {
@@ -116,16 +110,23 @@ const UrlAnalyzer = () => {
     accuracy: 90.0,
     precision: 92.0,
     recall: 88.0,
-    f1Score: 90.0,
-    trainingDataSize: 100000,
-    trainingTime: "Loading...",
-    lastUpdated: new Date().toISOString(),
-    framework: "PyTorch",
-    pythonVersion: "3.9.x"
+    f1_score: 90.0,
+    auc_roc: 0.92,
+    framework: "scikit-learn",
+    modelType: "Stack Ensemble",
+    baseModels: ["RandomForest", "GradientBoosting", "LogisticRegression"],
+    modelVersion: "2.0.0",
+    lastUpdated: new Date().toISOString()
   };
   
-  // Use real data or default
+  // Use real data or default, ensure it's never undefined
   const performanceData = modelPerformance || defaultModelPerformance;
+
+  // Format metrics safely with default value
+  const formatMetric = (value: number | undefined, decimals = 1): string => {
+    if (typeof value !== 'number') return '0'.padEnd(decimals + 2, '0');
+    return value.toFixed(decimals);
+  };
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 md:px-0">
@@ -134,14 +135,14 @@ const UrlAnalyzer = () => {
           Analyze Tweet URL Safety
         </h2>
         <p className="text-muted-foreground max-w-xl mx-auto">
-          Enter a Twitter/X URL to analyze for potential bot activity and security risks.
-          Our Python-based Learning Automata model will classify it as Safe, Suspicious, or Malicious.
+          Enter a Twitter/X URL to analyze for potential security risks.
+          Our ML model will classify it as Safe or Malicious with confidence scores.
         </p>
         <div className="mt-3 text-xs text-muted-foreground flex items-center justify-center">
           <AlertTriangle className="h-3 w-3 mr-1" />
           <span>
             {isLoadingModelData ? "Loading model data..." : 
-             `Model accuracy: ${performanceData.accuracy}% on test dataset with ${performanceData.trainingDataSize.toLocaleString()}+ URLs`}
+             `Model accuracy: ${formatMetric(performanceData?.accuracy)}% | F1: ${formatMetric(performanceData?.f1_score)}% | AUC-ROC: ${formatMetric(performanceData?.auc_roc, 2)}`}
           </span>
         </div>
       </div>
@@ -207,36 +208,35 @@ const UrlAnalyzer = () => {
       </div>
       
       <div className="mt-12 text-center text-sm text-muted-foreground">
-        <h3 className="font-medium mb-2">About Our Python-based Learning Automata Model</h3>
+        <h3 className="font-medium mb-2">About Our ML Model</h3>
         <p className="max-w-2xl mx-auto mb-4">
-          Our model was trained on {performanceData.trainingDataSize.toLocaleString()}+ labeled URLs from Twitter, using a combination 
-          of URL features, account metadata, and tweet behavioral patterns. The Python-based Learning Automata 
-          approach (using {performanceData.framework}) achieved {performanceData.accuracy}% accuracy on our test dataset, 
-          outperforming traditional machine learning models by 7.3%.
+          Our model uses advanced feature extraction and ensemble learning techniques, 
+          combining {performanceData?.baseModels?.join(", ") || "multiple"} models. The model 
+          achieved {formatMetric(performanceData?.accuracy)}% accuracy on our test dataset.
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
           <div className="p-3 bg-background/80 border rounded-lg">
-            <div className="text-lg font-bold">{performanceData.accuracy}%</div>
+            <div className="text-lg font-bold">{formatMetric(performanceData?.accuracy)}%</div>
             <div className="text-xs">Accuracy</div>
           </div>
           <div className="p-3 bg-background/80 border rounded-lg">
-            <div className="text-lg font-bold">{performanceData.precision}%</div>
+            <div className="text-lg font-bold">{formatMetric(performanceData?.precision)}%</div>
             <div className="text-xs">Precision</div>
           </div>
           <div className="p-3 bg-background/80 border rounded-lg">
-            <div className="text-lg font-bold">{performanceData.recall}%</div>
+            <div className="text-lg font-bold">{formatMetric(performanceData?.recall)}%</div>
             <div className="text-xs">Recall</div>
           </div>
           <div className="p-3 bg-background/80 border rounded-lg">
-            <div className="text-lg font-bold">{performanceData.f1Score}%</div>
+            <div className="text-lg font-bold">{formatMetric(performanceData?.f1_score)}%</div>
             <div className="text-xs">F1 Score</div>
           </div>
         </div>
         <div className="mt-4 flex justify-center items-center space-x-2 text-xs">
-          <Cpu className="h-3 w-3" />
+          <AlertTriangle className="h-3 w-3" />
           <span>
             {isLoadingModelData ? "Loading model information..." : 
-             `Built with Python ${performanceData.pythonVersion} and ${performanceData.framework}`}
+             `Built with ${performanceData?.framework || 'ML'} - ${performanceData?.modelType || 'Ensemble'}`}
           </span>
         </div>
       </div>
